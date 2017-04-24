@@ -30,7 +30,7 @@ J_bar = (bar_mass * (bar_length / 100)^2) / 12; % kg*m^2
 J_eff = motor1.J_m + J_g + (J_bar + J_s) / N^2; % kg*m^2
 
 %% Plant Trasnfer Function
-motor = motors(1);
+motor = motors(3);
 B_m = motor.B_m;
 K_T = motor.K_T;
 L = motor.L;
@@ -40,5 +40,5 @@ S = tf('s');
 num = G_v * ball_mass * g * K_s * K_T ; 
 den = S^5 * N * ( ball_mass + (J_b / ball_radius^2)) * ( L * J_eff + S^-1*(B_m * L + R * J_eff) + S^-2 * ( K_T^2 + B_m * R));
 
-T = num / den; 
-T = minreal(T);
+G = num / den; 
+G = minreal(G);
