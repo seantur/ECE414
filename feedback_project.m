@@ -18,4 +18,27 @@ J_s = 1.4e-7; % kg*m^2
 G_v = 5; % V/V
 g = 9.8; % m/s^2
 K_s = 10; % V/m
+N = 20; 
+%% Bar Properties
+bar_height = .2; % cm
+bar_width = 2; % cm
+bar_length = 50; % cm
+bar_volume = bar_height * bar_width * bar_length ; % cm^3
+bar_mass = aluminum_density * bar_volume / 1000; % kg
+J_bar = (bar_mass * (bar_length / 100)^2) / 12; % kg*m^2
+%% Effective Inertia
+J_eff = motor1.J_m + J_g + (J_bar + J_s) / N^2; % kg*m^2
+
 %% Plant Trasnfer Function
+motor = motors(1);
+B_m = motor.B_m;
+K_T = motor.K_T;
+L = motor.L;
+R = motor.R;
+
+S = tf('s');
+num = G_v * ball_mass * g * K_s * K_T ; 
+den = S^5 * N * ( ball_mass + (J_b / ball_radius^2)) * ( L * J_eff + S^-1*(B_m * L + R * J_eff) + S^-2 * ( K_T^2 + B_m * R));
+
+T = num / den; 
+T = minreal(T);
