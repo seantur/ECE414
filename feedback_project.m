@@ -42,3 +42,4 @@ den = S^5 * N * ( ball_mass + (J_b / ball_radius^2)) * ( L * J_eff + S^-1*(B_m *
 
 G = num / den; 
 G = minreal(G);
+% git
