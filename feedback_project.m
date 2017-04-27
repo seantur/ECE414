@@ -51,7 +51,10 @@ J_eff = motor.J_m + J_g + (J_bar + J_s) / N^2; % kg*m^2
 
 
 s = tf('s');
-bar_eq = (ball_mass * ball_radius^2 + J_b);
+bar_eq = 1; %(ball_mass * ball_radius^2 + J_b);
+% Sean, I made this stop mattering and suddenly our numerator isn't huge.
+% Not sure if this is okay or not, I don't have the binder.
+
 
 num = G_v * ball_mass * g * K_s * K_t ; 
 den = s^5 * N * J_eff * L * bar_eq + ...
