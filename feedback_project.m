@@ -61,6 +61,24 @@ den = s^5 * N * J_eff * L * bar_eq + ...
       s^4 * N * (B_m * L + R * J_eff) * bar_eq + ...
       s^3 * N * (K_t^2 + B_m * R) * bar_eq;
   
+% Symbolic
+%{
+syms N
+syms ball_mass
+syms J_b
+syms ball_radius
+syms L
+syms J_eff
+syms s
+syms R
+syms K_T
+syms K_s
+syms B_m
+%}
+num = G_v * ball_mass * g * K_s * K_t ; 
+den = s^5 * N * ( ball_mass + (J_b / ball_radius^2)) * ( L * J_eff + s^-1*(B_m * L + R * J_eff) + s^-2 * ( K_t^2 + B_m * R));
+
+  
 G = num / den;
 G = minreal(G)
 
