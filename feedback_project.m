@@ -60,3 +60,6 @@ den = s^5 * N * (ball_mass + (J_b / ball_radius^2)) * ...
 G = num / den;
 G = minreal(G)
 
+%% Controller
+
+
