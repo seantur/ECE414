@@ -49,35 +49,13 @@ L = motor.L;
 R = motor.R;
 J_eff = motor.J_m + J_g + (J_bar + J_s) / N^2; % kg*m^2
 
-
 s = tf('s');
-bar_eq = 1; %(ball_mass * ball_radius^2 + J_b);
-% Sean, I made this stop mattering and suddenly our numerator isn't huge.
-% Not sure if this is okay or not, I don't have the binder.
-
-
-num = G_v * ball_mass * g * K_s * K_t ; 
-den = s^5 * N * J_eff * L * bar_eq + ...
-      s^4 * N * (B_m * L + R * J_eff) * bar_eq + ...
-      s^3 * N * (K_t^2 + B_m * R) * bar_eq;
   
-% Symbolic
-%{
-syms N
-syms ball_mass
-syms J_b
-syms ball_radius
-syms L
-syms J_eff
-syms s
-syms R
-syms K_T
-syms K_s
-syms B_m
-%}
-num = G_v * ball_mass * g * K_s * K_t ; 
-den = s^5 * N * ( ball_mass + (J_b / ball_radius^2)) * ( L * J_eff + s^-1*(B_m * L + R * J_eff) + s^-2 * ( K_t^2 + B_m * R));
+num = G_v * ball_mass * g * K_s * K_t;
 
+den = s^5 * N * (ball_mass + (J_b / ball_radius^2)) * ...
+      (L * J_eff + s^-1*(B_m * L + R * J_eff) +  ...
+      s^-2 * (K_t^2 + B_m * R));
   
 G = num / den;
 G = minreal(G)
