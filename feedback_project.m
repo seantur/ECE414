@@ -63,10 +63,10 @@ G = minreal(G)
 %% Controller
 G = zpk(G)
 
-ts = .5;
+ts = .05;
 os = 0;
 n = 9;
-sp = 2;
 
-[num,den] = stepshape(n,os,ts,sp);
+[num,den] = stepshape(n,os,ts);
 [D,T,Tu,Td,L]=lamdesign(G,den);
+step(T)
