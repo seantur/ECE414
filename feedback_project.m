@@ -157,9 +157,8 @@ den = s^5 * N * (ball_mass + (J_b / ball_radius^2)) * ...
   
 G = num / den;
 G = minreal(G)
-%}
 %% Controller
-%{
+
 G = zpk(G)
 
 z1 = -.0001 + j*.0001;   % Pole, Zero, and K
@@ -263,13 +262,13 @@ D = K*D;  % Multiply in K
 T = feedback(D*G1, 1);  % Get transfer function T
 [Tu, umax] = controleffort(G1, T);
 S = stepinfo(T);
-%step(T);
+step(T);
 
 %% Actual Plant (Motor Controller & Ball Dynamics)
 G = T*G2;
 rlocus(G);
 
-ts = .2;
+ts = 5;
 os = 0;
 n = 6;
 
