@@ -139,6 +139,7 @@ clear ch_volume aluminum_density bar_height bar_width bar_ch_depth
 clear ch_volume bar_ch_width bar_noch_volume
 
 %% Plant Transfer Function
+%{
 motor = motors(1);
 B_m = motor.B_m;
 K_t = motor.K_t;
@@ -156,7 +157,7 @@ den = s^5 * N * (ball_mass + (J_b / ball_radius^2)) * ...
   
 G = num / den;
 G = minreal(G)
-
+%}
 %% Controller
 %{
 G = zpk(G)
@@ -189,6 +190,7 @@ Tu
 S
 %}
 %% Another Controller
+%{
 G = zpk(G)
 
 z1 = -.0001 + j*.0001;   % Pole, Zero, and K
@@ -217,3 +219,64 @@ step(T);
 fprintf('umax:%.2f\nOvershoot:%.2f\nSettling Time:%.2f\n',umax, S.Overshoot, S.SettlingTime);
 Tu
 S
+%}
+%% New Plant Design
+
+motor = motors(1);
+B_m = motor.B_m;
+K_t = motor.K_t;
+L = motor.L;
+R = motor.R;
+J_eff = motor.J_m + J_g + (J_bar + J_s) / N^2; % kg*m^2
+
+s = tf('s');
+  
+num = G_v * K_t;
+
+den = s^3 * N  * (L * J_eff + s^-1*(B_m * L + R * J_eff) +  ...
+      s^-2 * (K_t^2 + B_m * R));
+  
+G1 = num / den;
+
+num = ball_mass * g * K_s;
+
+den = s^2 * (ball_mass + (J_b / ball_radius^2));
+
+G2 = num / den;
+
+G1 = minreal(G1);
+G2 = minreal(G2);
+
+%% Motor Controller for G1
+G1 = zpk(G1)
+
+z1 = -2;   % Pole, Zero, and K
+p1 = -3;
+K = 5;
+
+
+D = zpk([z1], [p1], 1);
+figure(1)
+rlocus(D*G1); 
+
+D = K*D;  % Multiply in K
+T = feedback(D*G1, 1);  % Get transfer function T
+[Tu, umax] = controleffort(G1, T);
+S = stepinfo(T);
+%step(T);
+
+%% Actual Plant (Motor Controller & Ball Dynamics)
+G = T*G2;
+rlocus(G);
+
+ts = .2;
+os = 0;
+n = 6;
+
+R = [-20, -15, -30 , -10, -25, -25, -30, -40];
+T = stepshape(n,os,ts);
+
+[F,H,Tu,Td,L]=lamdesign(G,T,R); %computes the compensator coefficients
+
+S = stepinfo(T);
+step(T);
