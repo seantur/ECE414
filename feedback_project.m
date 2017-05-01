@@ -90,6 +90,11 @@ n = 9;
 step(T)
 %}
 %%%%%%%%%% Version 2
+% Talked with Hanselman: Bug in code prevents LAMDesign from working
+%%%%%%%%%% Version 3
+% pidTuner was not returning stable results
+%%%%%%%%%% Version 4
+% PID placing by hand
 %% Densities
 stainless_density = 7.97; % g/cm^3
 aluminum_density = 2.7; % g/cm^3
@@ -116,7 +121,7 @@ J_s = 1.4e-7; % kg*m^2
 G_v = 5; % V/V
 g = 9.8; % m/s^2
 K_s = 10; % V/m
-N = 50; 
+N = 25; 
 
 %% Bar Properties
 bar_height = .8; % cm
@@ -134,7 +139,7 @@ clear ch_volume aluminum_density bar_height bar_width bar_ch_depth
 clear ch_volume bar_ch_width bar_noch_volume
 
 %% Plant Transfer Function
-motor = motors(2);
+motor = motors(1);
 B_m = motor.B_m;
 K_t = motor.K_t;
 L = motor.L;
@@ -153,18 +158,62 @@ G = num / den;
 G = minreal(G)
 
 %% Controller
+%{
 G = zpk(G)
 
-ts = .05;
-os = 1;
-n = 9;
+z1 = -.0001 + j*.0001;   % Pole, Zero, and K
+z2 = -.0001 - j*.0001;
+p1 = -1000;
+p2 = -2000;
+K = 10E9;
 
-[num,den] = stepshape(n,os,ts);
-[D,T,Tu,Td,L]=lamdesign(G,den);
-step(T)
 
-[J,S] = ece414pm(G, L, T);
-S.Os
-S.Umax
-S.Ts
-S.Smax
+D = zpk([z1,z2,z3,z4,z5], [p1,p2,p3,p4,p5], 1);
+figure(1)
+rlocus(D*G); 
+
+D = K*D;  % Multiply in K
+T = feedback(D*G, 1);  % Get transfer function T
+[Tu, umax] = controleffort(G, T);
+S = stepinfo(T);
+
+kd = K/p;   % convert from poles, zeros, and k to parameters
+kp = z * kd;
+
+D   % printing
+fprintf('Kd:%.2f\nKp:%.2f\n',kd,kp);
+figure(2)
+step(T);
+fprintf('umax:%.2f\nOvershoot:%.2f\nSettling Time:%.2f\n',umax, S.Overshoot, S.SettlingTime);
+Tu
+S
+%}
+%% Another Controller
+G = zpk(G)
+
+z1 = -.0001 + j*.0001;   % Pole, Zero, and K
+z2 = -.0001 - j*.0001;
+p1 = -1000;
+p2 = -2000;
+K = 10E9;
+
+
+D = zpk([z1,z2,z3,z4,z5], [p1,p2,p3,p4,p5], 1);
+figure(1)
+rlocus(D*G); 
+
+D = K*D;  % Multiply in K
+T = feedback(D*G, 1);  % Get transfer function T
+[Tu, umax] = controleffort(G, T);
+S = stepinfo(T);
+
+kd = K/p;   % convert from poles, zeros, and k to parameters
+kp = z * kd;
+
+D   % printing
+fprintf('Kd:%.2f\nKp:%.2f\n',kd,kp);
+figure(2)
+step(T);
+fprintf('umax:%.2f\nOvershoot:%.2f\nSettling Time:%.2f\n',umax, S.Overshoot, S.SettlingTime);
+Tu
+S
