@@ -268,29 +268,9 @@ step(T);
 
 G = T*G2;
 
-z1 = -40;   % Pole, Zero, and K
-z2 = -40;
-p1 = -400;
-p2 = -400;
-
-K = 1;
-
-D = zpk([z1,z2], [p1,p2], 1);
-sisotool(D*G);
-
-figure(1)
-rlocus(D*G); 
-
-D = K*D;  % Multiply in K
-T = feedback(D*G, 1);  % Get transfer function T
-[Tu, umax] = controleffort(G, T);
-S = stepinfo(T);
-figure(2);
-step(T);
-S
-
-
+Controller = load('controller.mat');
 % (from pidTuner, PDF)
+% (saved as controller.mat)
 %{
 D =
  
@@ -298,3 +278,12 @@ D =
   ------------------
       (s+272.3)
 %}
+
+D = zpk(Controller.C); % convert from pid format to zpk
+
+T = feedback(D*G, 1);  % Get transfer function T
+[Tu, umax] = controleffort(G, T);
+S = stepinfo(T);
+figure(1);
+step(T);
+S
