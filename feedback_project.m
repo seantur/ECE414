@@ -249,9 +249,9 @@ G2 = minreal(G2);
 %% Motor Controller for G1
 G1 = zpk(G1)
 
-z1 = -2;   % Pole, Zero, and K
-p1 = -3;
-K = 5;
+z1 = -10;   % Pole, Zero, and K
+p1 = -15;
+K = 40;
 
 
 D = zpk([z1], [p1], 1);
@@ -265,17 +265,36 @@ S = stepinfo(T);
 step(T);
 
 %% Actual Plant (Motor Controller & Ball Dynamics)
+
 G = T*G2;
-rlocus(G);
 
-ts = 5;
-os = 0;
-n = 6;
+z1 = -40;   % Pole, Zero, and K
+z2 = -40;
+p1 = -400;
+p2 = -400;
 
-R = [-20, -15, -30 , -10, -25, -25, -30, -40];
-T = stepshape(n,os,ts);
+K = 1;
 
-[F,H,Tu,Td,L]=lamdesign(G,T,R); %computes the compensator coefficients
+D = zpk([z1,z2], [p1,p2], 1);
+sisotool(D*G);
 
+figure(1)
+rlocus(D*G); 
+
+D = K*D;  % Multiply in K
+T = feedback(D*G, 1);  % Get transfer function T
+[Tu, umax] = controleffort(G, T);
 S = stepinfo(T);
+figure(2);
 step(T);
+S
+
+
+% (from pidTuner, PDF)
+%{
+D =
+ 
+  9.3617 (s+0.02085)
+  ------------------
+      (s+272.3)
+%}
