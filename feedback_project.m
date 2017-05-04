@@ -265,7 +265,7 @@ S = stepinfo(T);
 step(T);
 
 %% Actual Plant (Motor Controller & Ball Dynamics)
-
+%{
 G = T*G2;
 
 Controller = load('controller.mat');
@@ -287,3 +287,4 @@ S = stepinfo(T);
 figure(1);
 step(T);
 S
+%}
